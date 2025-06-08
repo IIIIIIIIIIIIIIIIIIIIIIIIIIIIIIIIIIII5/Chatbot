@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 const OPENAI_KEY = process.env.OPENAIKEY;
 
 if (!OPENAI_KEY) {
-  console.error("ERROR: OPENAI_KEY is not set in environment variables");
+  console.error("ERROR: OPENAIKEY is not set in environment variables");
   process.exit(1);
 }
 
