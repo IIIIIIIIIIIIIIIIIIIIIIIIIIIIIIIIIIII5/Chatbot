@@ -1,18 +1,22 @@
 const express = require("express");
 const axios = require("axios");
-const cors = require("cors");
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
+const OPENAI_KEY = process.env.OPENAI_KEY;
+
 app.use(express.json());
 
-const OPENAI_API_KEY = process.env.OPENAIKEY;
+app.get("/", (req, res) => {
+  res.send("AI proxy is running 🚀");
+});
 
-app.post("/ask", async (req, res) => {
+app.post("/chat", async (req, res) => {
   const { question } = req.body;
+  if (!question) return res.status(400).json({ error: "No question provided" });
 
   try {
-    const response = await axios.post(
+    const result = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
         model: "gpt-4o-mini",
@@ -20,16 +24,19 @@ app.post("/ask", async (req, res) => {
       },
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-        },
+          "Authorization": `Bearer ${OPENAI_KEY}`,
+          "Content-Type": "application/json"
+        }
       }
     );
-
-    res.json({ reply: response.data.choices[0].message.content });
+    const reply = result.data.choices[0].message.content;
+    res.json({ reply });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err.response?.data || err.message);
+    res.status(500).json({ error: "AI request failed" });
   }
 });
 
-app.listen(3000, () => console.log("Proxy running on port 3000"));
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server listening on port ${PORT}`);
+});
