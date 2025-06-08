@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const OPENAI_API_KEY = "YOUR-REAL-KEY-HERE";
+const OPENAI_API_KEY = process.env.OPENAIKEY;
 
 app.post("/ask", async (req, res) => {
   const { question } = req.body;
