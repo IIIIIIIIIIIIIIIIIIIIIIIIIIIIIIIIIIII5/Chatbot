@@ -14,26 +14,35 @@ app.use(express.json());
 
 app.post("/chat", async (req, res) => {
   const { question } = req.body;
-  if (!question) return res.status(400).json({ error: "No question provided" });
+  console.log("→ Incoming question:", question);
+
+  if (!question) {
+    console.log("❌ No question provided in body:", req.body);
+    return res.status(400).json({ error: "No question provided" });
+  }
 
   try {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: question }]
-      },
+      { model: "gpt-4o-mini", messages: [{ role: "user", content: question }] },
       {
         headers: {
-          "Authorization": `Bearer ${OPENAIKEY}`,
+          Authorization: `Bearer ${OPENAIKEY}`,
           "Content-Type": "application/json"
-        }
+        },
+        timeout: 15000
       }
     );
-    const reply = response.data.choices[0].message.content;
-    res.json({ reply });
-  } catch (error) {
-    console.error("OpenAI API Error:", error.response?.data || error.message);
+    console.log("✅ OpenAI API success:", response.data.choices[0].message.content);
+    res.json({ reply: response.data.choices[0].message.content });
+  } catch (err) {
+    console.error("❌ OpenAI API failed:");
+    if (err.response) {
+      console.error("→ Status:", err.response.status);
+      console.error("→ Data:", err.response.data);
+    } else {
+      console.error("→ Error message:", err.message);
+    }
     res.status(500).json({ error: "AI request failed" });
   }
 });
