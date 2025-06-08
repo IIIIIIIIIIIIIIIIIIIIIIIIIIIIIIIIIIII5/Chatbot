@@ -3,9 +3,9 @@ const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const OPENAI_KEY = process.env.OPENAIKEY;
+const OPENAIKEY = process.env.OPENAIKEY;
 
-if (!OPENAI_KEY) {
+if (!OPENAIKEY) {
   console.error("ERROR: OPENAIKEY is not set in environment variables");
   process.exit(1);
 }
