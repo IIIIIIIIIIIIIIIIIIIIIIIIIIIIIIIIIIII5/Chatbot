@@ -9,9 +9,13 @@ const OPENAI_KEY = process.env.OPENAI_KEY;
 app.use(cors());
 app.use(express.json());
 
+console.log("🔑 OpenAI Key loaded?", !!OPENAI_KEY);
+
 app.get("/", (req, res) => {
   res.send("AI proxy is running 🚀");
 });
+
+console.log("🔑 OpenAI Key loaded?", !!OPENAI_KEY);
 
 app.post("/chat", async (req, res) => {
   const { question } = req.body;
@@ -34,9 +38,11 @@ app.post("/chat", async (req, res) => {
     const reply = result.data.choices[0].message.content;
     res.json({ reply });
   } catch (err) {
-    console.error("OpenAI API Error:", err.response?.data || err.message || err);
-    res.status(500).json({ error: "AI request failed" });
-  }
+  console.error("❌ OpenAI API Error");
+  console.error("Status:", err.response?.status);
+  console.error("Data:", err.response?.data);
+  res.status(500).json({ error: "AI request failed" });
+}
 });
 
 app.listen(PORT, "0.0.0.0", () => {
